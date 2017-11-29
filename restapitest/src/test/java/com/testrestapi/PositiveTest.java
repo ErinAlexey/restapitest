@@ -10,90 +10,38 @@ package com.testrestapi;
  */
 
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.testrestapi.ParamValidator;
 
-import io.restassured.RestAssured;
-import static io.restassured.RestAssured.*;
-
 public class PositiveTest {
 
-	@BeforeClass
-	public void setBaseUri () {
-		RestAssured.baseURI = "https://platform.devtest.ringcentral.com";
-	}	
-	
 	/**
-	 * Test for checking that the 
-	 * releaseDate field is not empty
+	 * Test for checking that the Server Revision, Server Version
+	 * and Release Date fields is not empty
+	 * 
+	 * @param parameter - parameter for check
+	 * @param expectedResult - expected result
+	 * @param field - name of parameter
 	 */
-	@Test(description="Сheck that the field releaseDate not empty")
-	public void testReleaseDateNotNull () {
-		String res = get("/restapi/v1.0")
-				.path("releaseDate");
-		Assert.assertTrue(ParamValidator.checkStringNotEmpty(res), 
-				"Field Release Date is empty");
+	@Test(dataProvider = "getTestNotEmptyData", 
+			dataProviderClass = TestDataProvider.class)
+	public void testParameterNotEmpty (String parameter, boolean expectedResult, String field) {
+		Assert.assertEquals(ParamValidator.checkStringNotEmpty(parameter), expectedResult,
+				"Field "+ field + " is empty");
 	}
-	
+
 	/**
-	 * Test for checking that the Release Date 
-	 * field in the format 'YYYY-MM-DD'
+	 * Test for checking that the Server Revision, Server Version
+	 * and Release Date fields in the required format
+	 * 
+	 * @param parameter - parameter for check
+	 * @param expectedResult - expected result
+	 * @param message - error message
 	 */
-	@Test(description="Сheck that the field releaseDate matches the format 'YYYY-MM-DD'")
-	public void testReleaseDateFormat () {		
-		String res = get("/restapi/v1.0")
-				.path("releaseDate");
-		Assert.assertTrue(ParamValidator.checkReleaseDateFormat(res),
-				"Field Release Date not in YYYY-MM-DD format");		
-	}
-	
-	/**
-	 * Test for checking that the 
-	 * Server Version field is not empty
-	 */
-	@Test(description="Сheck that the field serverVersion not empty")
-	public void testServerVersionNotNull () {
-		String res = get("/restapi")
-				.path("serverVersion");
-		Assert.assertTrue(ParamValidator.checkStringNotEmpty(res),
-				"Field Server Version is empty");
-	}
-	
-	/**
-	 * Test for checking that the Server Version 
-	 * field in the format 'D.D.D.DDD'
-	 */
-	@Test(description="Сheck that the field serverVersion matches the format 'D.D.D.DDD'")
-	public void testServerVersionFormat () {		
-		String res = get("/restapi")
-				.path("serverVersion");
-		Assert.assertTrue(ParamValidator.checkServerVersionFormat(res),
-				"Field Server Version not in D.D.D.DDD format");		
-	}
-	
-	/**
-	 * Test for checking that the 
-	 * Server Revision field is not empty
-	 */
-	@Test(description="Сheck that the field serverRevision not empty")
-	public void testServerRevisionNotNull () {
-		String res = get("/restapi")
-				.path("serverRevision");
-		Assert.assertTrue(ParamValidator.checkStringNotEmpty(res),
-				"Field Server Revision is empty");
-	}
-	
-	/**
-	 * Test for checking that the Server Revision 
-	 * field in the format 12 character hash-string
-	 */
-	@Test(description="Сheck that the field serverRevision matches the format: 12-character hash string")
-	public void testServerRevisionFormat () {		
-		String res = get("/restapi")
-				.path("serverRevision");
-		Assert.assertTrue(ParamValidator.checkServerRevisionFormat(res),
-				"Field Server Revision not in format 12-character hash string");		
+	@Test(dataProvider = "getTestFormatData", 
+			dataProviderClass = TestDataProvider.class)
+	public void testParameterFormat (boolean parameter, boolean expectedResult, String message) {
+		Assert.assertEquals(parameter, expectedResult, message);
 	}
 }
